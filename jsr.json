@@ -1,0 +1,23 @@
+{
+  "name": "@decomm/ident",
+  "version": "1.0.0",
+  "license": "MIT",
+  "exports": {
+    ".": "./main.ts",
+    "./init": "./init.ts"
+  },
+  "publish": {
+    "include": [
+      "main.ts",
+      "args.ts",
+      "hash.ts",
+      "store.ts",
+      "init.ts",
+      "ident.sh",
+      "README.md",
+      "LICENSE",
+      "deno.json",
+      "jsr.json"
+    ]
+  }
+}
