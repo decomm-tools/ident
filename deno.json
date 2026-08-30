@@ -21,9 +21,9 @@
     ]
   },
   "tasks": {
-    "ident": "deno run --allow-read --allow-write --allow-net --allow-env=IDENT_DIR main.ts",
-    "compile": "mkdir -p bin && deno compile --allow-read --allow-write --allow-net --allow-env=IDENT_DIR --output bin/ident main.ts",
-    "test": "deno test --allow-read --allow-write --allow-net --allow-env",
+    "ident": "deno run --allow-read --allow-write --allow-env=IDENT_DIR main.ts",
+    "compile": "mkdir -p bin && deno compile --allow-read --allow-write --allow-env=IDENT_DIR --output bin/ident main.ts",
+    "test": "deno test --allow-read --allow-write --allow-net --allow-env --allow-run",
     "check": "deno check main.ts args.ts hash.ts store.ts init.ts",
     "fmt": "deno fmt",
     "lint": "deno lint"

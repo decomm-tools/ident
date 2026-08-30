@@ -76,3 +76,36 @@ Deno.test("bad handle is rejected", async () => {
     await Deno.remove(dir, { recursive: true });
   }
 });
+
+const identSh = async (dir: string, args: string[]): Promise<string> => {
+  const proc = new Deno.Command("sh", {
+    args: [`${Deno.cwd()}/ident.sh`, "--dir", dir, ...args],
+    cwd: Deno.cwd(),
+    stdout: "piped",
+    stderr: "piped",
+  });
+  const out = await proc.output();
+  const stdout = new TextDecoder().decode(out.stdout);
+  const stderr = new TextDecoder().decode(out.stderr);
+  if (!out.success) throw new Error(stderr || stdout);
+  return stdout;
+};
+
+Deno.test("ident.sh create writes json svg and card", async () => {
+  const dir = await Deno.makeTempDir({ prefix: "decomm-ident-sh-" });
+  try {
+    const created = await identSh(dir, ["create", "holden"]);
+    assertStringIncludes(created, "created holden");
+    assertStringIncludes(created, "fingerprint");
+    await Deno.stat(`${dir}/holden/ident.json`);
+    const svg = await Deno.readTextFile(`${dir}/holden/face.svg`);
+    assertStringIncludes(svg, "<svg");
+    const card = await Deno.readTextFile(`${dir}/holden/card.html`);
+    assertStringIncludes(card, "holden");
+    assertStringIncludes(await identSh(dir, ["list"]), "holden");
+    assertStringIncludes(await identSh(dir, ["show", "holden"]), "holden");
+    assertEquals((await identSh(dir, ["card", "holden"])).trim(), `${dir}/holden/card.html`);
+  } finally {
+    await Deno.remove(dir, { recursive: true });
+  }
+});
