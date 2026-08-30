@@ -48,7 +48,10 @@ Deno.test("create writes json svg and card; same handle is stable", async () => 
     const again = await run(["--dir", dir, "create", "--force", "holden"]);
     assertStringIncludes(again, ident.fingerprint);
     assertStringIncludes(await run(["--dir", dir, "list"]), "holden");
-    assertStringIncludes(await run(["--dir", dir, "show", "holden"]), ident.fingerprint);
+    assertStringIncludes(
+      await run(["--dir", dir, "show", "holden"]),
+      ident.fingerprint,
+    );
     assertEquals(
       (await run(["--dir", dir, "card", "holden"])).trim(),
       `${dir}/holden/card.html`,
@@ -62,7 +65,11 @@ Deno.test("create refuses a collision without --force", async () => {
   const dir = await Deno.makeTempDir({ prefix: "decomm-ident-clash-" });
   try {
     await run(["--dir", dir, "create", "box"]);
-    await assertRejects(() => run(["--dir", dir, "create", "box"]), Error, "already exists");
+    await assertRejects(
+      () => run(["--dir", dir, "create", "box"]),
+      Error,
+      "already exists",
+    );
   } finally {
     await Deno.remove(dir, { recursive: true });
   }
@@ -71,7 +78,11 @@ Deno.test("create refuses a collision without --force", async () => {
 Deno.test("bad handle is rejected", async () => {
   const dir = await Deno.makeTempDir({ prefix: "decomm-ident-bad-" });
   try {
-    await assertRejects(() => run(["--dir", dir, "create", "Bad Handle"]), Error, "Bad handle");
+    await assertRejects(
+      () => run(["--dir", dir, "create", "Bad Handle"]),
+      Error,
+      "Bad handle",
+    );
   } finally {
     await Deno.remove(dir, { recursive: true });
   }
@@ -104,7 +115,23 @@ Deno.test("ident.sh create writes json svg and card", async () => {
     assertStringIncludes(card, "holden");
     assertStringIncludes(await identSh(dir, ["list"]), "holden");
     assertStringIncludes(await identSh(dir, ["show", "holden"]), "holden");
-    assertEquals((await identSh(dir, ["card", "holden"])).trim(), `${dir}/holden/card.html`);
+    assertEquals(
+      (await identSh(dir, ["card", "holden"])).trim(),
+      `${dir}/holden/card.html`,
+    );
+  } finally {
+    await Deno.remove(dir, { recursive: true });
+  }
+});
+
+Deno.test("ident.sh init create show is the carry-in example", async () => {
+  const dir = await Deno.makeTempDir({ prefix: "decomm-ident-carry-" });
+  try {
+    assertStringIncludes(await identSh(dir, ["init"]), dir);
+    const created = await identSh(dir, ["create", "holden"]);
+    assertStringIncludes(created, "created holden");
+    assertStringIncludes(await identSh(dir, ["show", "holden"]), "holden");
+    await Deno.stat(`${dir}/holden/card.html`);
   } finally {
     await Deno.remove(dir, { recursive: true });
   }
